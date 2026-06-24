@@ -62,13 +62,13 @@ const options = {
   
 
   // Crear el servidor HTTPS
-  https.createServer(options, app).listen(3000,'0.0.0.0', () => {
-    console.log('Servidor HTTPS escuchando en el puerto 3000 ');
+  https.createServer(options, app).listen(3300,'0.0.0.0', () => {
+    console.log('Servidor HTTPS escuchando en el puerto 3300 ');
   });  
   
  
  
-const PORT = process.env.SERVER_PORT || 3000;
+const PORT = process.env.SERVER_PORT || 3300;
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en puerto ${PORT}`);
   console.log(`Abre http://localhost:${PORT} en tu navegador`);
