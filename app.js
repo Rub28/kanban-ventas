@@ -50,8 +50,25 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
+// Cargar los certificados de Let's Encrypt
+// solo para produccion. 
+
+const options = {
+    key: fs.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/privkey.pem')),
+    cert: fs.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/fullchain.pem')),
+  };
+  
+
+  // Crear el servidor HTTPS
+  https.createServer(options, app).listen(3000,'0.0.0.0', () => {
+    console.log('Servidor HTTPS escuchando en el puerto 3000 ');
+  });  
+  
+  
+/*  
 const PORT = process.env.SERVER_PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en puerto ${PORT}`);
   console.log(`Abre http://localhost:${PORT} en tu navegador`);
 });
+*/ 
