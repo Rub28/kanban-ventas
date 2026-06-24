@@ -54,8 +54,8 @@ app.use((err, req, res, next) => {
 // solo para produccion. 
 
 const options = {
-    key: fs.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/privkey.pem')),
-    cert: fs.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/fullchain.pem')),
+    key: fs.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/privkey4.pem')),
+    cert: fs.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/fullchain4.pem')),
   };
   
 
@@ -64,7 +64,7 @@ const options = {
     console.log('Servidor HTTPS escuchando en el puerto 3000 ');
   });  
   
-  
+
 /*  
 const PORT = process.env.SERVER_PORT || 3000;
 app.listen(PORT, () => {
