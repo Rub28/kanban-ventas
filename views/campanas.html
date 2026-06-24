@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrador de Campañas - WhatsApp Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Estilos específicos para Campañas */
+    .campaigns-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .campaigns-section,
+    .events-section {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-header {
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      color: white;
+      padding: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--primary-color);
+    }
+
+    .section-header h2 {
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .btn-add-campaign {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .btn-add-campaign:hover {
+      background-color: #27ae60;
+      transform: translateY(-2px);
+    }
+
+    .campaigns-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .campaign-item {
+      background: #f8f9fa;
+      border: 2px solid #ecf0f1;
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .campaign-item:hover {
+      border-color: var(--secondary-color);
+      box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+      transform: translateX(4px);
+    }
+
+    .campaign-item.active {
+      background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+      border-color: #2980b9;
+      color: white;
+    }
+
+    .campaign-info {
+      flex: 1;
+    }
+
+    .campaign-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .campaign-desc {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .campaign-date {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      margin-top: 0.3rem;
+    }
+
+    .campaign-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: 1rem;
+    }
+
+    .btn-edit-sm,
+    .btn-delete-sm {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.3rem 0.6rem;
+      transition: var(--transition);
+    }
+
+    .btn-edit-sm {
+      color: var(--secondary-color);
+    }
+
+    .btn-edit-sm:hover {
+      color: #2980b9;
+      transform: scale(1.2);
+    }
+
+    .btn-delete-sm {
+      color: var(--danger-color);
+    }
+
+    .btn-delete-sm:hover {
+      color: #c0392b;
+      transform: scale(1.2);
+    }
+
+    .campaign-item.active .btn-edit-sm,
+    .campaign-item.active .btn-delete-sm {
+      color: white;
+    }
+
+    /* Sección de formulario */
+    .campaign-form-section {
+      padding: 1.5rem;
+      border-bottom: 1px solid #ecf0f1;
+    }
+
+    .campaign-form-section h3 {
+      font-size: 1rem;
+      color: var(--dark-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      color: var(--dark-color);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid #ecf0f1;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .btn-save,
+    .btn-cancel {
+      flex: 1;
+      padding: 0.7rem;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .btn-save {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-save:hover {
+      background-color: #27ae60;
+    }
+
+    .btn-cancel {
+      background-color: #ecf0f1;
+      color: var(--dark-color);
+    }
+
+    .btn-cancel:hover {
+      background-color: #bdc3c7;
+    }
+
+    /* Sección de eventos */
+    .events-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .events-empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-color);
+      text-align: center;
+    }
+
+    .events-empty i {
+      font-size: 3rem;
+      opacity: 0.3;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .events-table {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .events-header {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-bottom: 1px solid #ecf0f1;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 0.8rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--dark-color);
+    }
+
+    .events-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .event-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 0.8rem;
+      padding: 0.8rem;
+      border-bottom: 1px solid #ecf0f1;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+
+    .event-row:hover {
+      background-color: #f8f9fa;
+    }
+
+    .event-freq {
+      background: var(--light-color);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .event-days {
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .day-badge {
+      background: var(--secondary-color);
+      color: white;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .event-actions {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: flex-end;
+    }
+
+    .btn-event-edit,
+    .btn-event-delete {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0.3rem 0.5rem;
+      transition: var(--transition);
+      color: var(--secondary-color);
+    }
+
+    .btn-event-edit:hover {
+      color: #2980b9;
+      transform: scale(1.15);
+    }
+
+    .btn-event-delete:hover {
+      color: var(--danger-color);
+      transform: scale(1.15);
+    }
+
+    .btn-add-event {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+      margin: 1rem;
+    }
+
+    .btn-add-event:hover {
+      background-color: #27ae60;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 5px 40px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      color: white;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--primary-color);
+    }
+
+    .modal-header h2 {
+      font-size: 1.2rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.5rem;
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 2rem;
+    }
+
+    .event-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .days-group {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      margin-top: 1rem;
+    }
+
+    .days-group label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.8rem;
+      color: var(--dark-color);
+      font-size: 0.9rem;
+    }
+
+    .days-checkboxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: auto;
+      cursor: pointer;
+    }
+
+    .checkbox-item label {
+      margin: 0;
+      font-weight: normal;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .no-campaign-message {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray-color);
+    }
+
+    .no-campaign-message i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+      display: block;
+    }
+
+    @media (max-width: 1200px) {
+      .campaigns-container {
+        grid-template-columns: 1fr;
+      }
+
+      .events-header {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .event-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo-section">
+          <i class="fas fa-comments"></i>
+          <h1>Gestor de Mensajes WhatsApp</h1>
+        </div>
+        <div class="user-section">
+          <div class="user-info">
+            <span class="user-name" id="userName">Cargando...</span>
+            <span class="user-role" id="userRole">-</span>
+          </div>
+          <button class="btn-logout" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Salir
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Barra de herramientas -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <h2 style="margin: 0; color: var(--dark-color);">
+          <i class="fas fa-bullhorn"></i> Administrador de Campañas
+        </h2>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn-refresh" onclick="volverAlTablero()">
+          <i class="fas fa-arrow-left"></i> Volver al Tablero
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <main class="main-content">
+      <div class="campaigns-container">
+        <!-- Sección de Campañas -->
+        <div class="campaigns-section">
+          <div class="section-header">
+            <h2>
+              <i class="fas fa-list"></i> Campañas
+            </h2>
+            <button class="btn-add-campaign" id="btnAddCampaign" onclick="abrirNuevaCampaña()">
+              <i class="fas fa-plus"></i> Nueva
+            </button>
+          </div>
+
+          <div class="campaigns-list" id="campaignsList">
+            <!-- Las campañas se cargarán aquí -->
+          </div>
+
+          <!-- Formulario de Campaña -->
+          <div class="campaign-form-section" id="campaignFormSection" style="display: none;">
+            <h3>
+              <i class="fas fa-edit"></i> <span id="formTitle">Nueva Campaña</span>
+            </h3>
+            <form id="campaignForm">
+              <div class="form-group">
+                <label for="campaignText">Texto de Información:</label>
+                <textarea id="campaignText" placeholder="Ingrese el texto de la campaña..." required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="campaignImage">ID de Imagen:</label>
+                <input type="text" id="campaignImage" placeholder="Ej: IMG001" maxlength="20">
+              </div>
+
+             <div class="form-group">
+                <label for="campaignTipocliente">Tipo de Cliente:</label>
+                <select id="campaignTipocliente">
+                  <option value="NUEVO">NUEVO</option> 
+                  <option value="EVENTUAL">EVENTUAL</option> 
+                  <option value="PREFERENTE">PREFERENTE</option> 
+                </select> 
+              </div>
+
+              <div class="form-group">
+                <label for="campaignStatus">Estado:</label>
+                <select id="campaignStatus">
+                  <option value="ALTA">Activa</option>
+                  <option value="BAJA">Inactiva</option>
+                  <option value="PAUSADA">Pausada</option>
+                </select>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn-save">
+                  <i class="fas fa-save"></i> Guardar Campaña
+                </button>
+                <button type="button" class="btn-cancel" onclick="cancelarFormulario()">
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Sección de Eventos -->
+        <div class="events-section">
+          <div class="section-header">
+            <h2>
+              <i class="fas fa-calendar-alt"></i> Eventos de Campaña
+            </h2>
+          </div>
+
+          <div class="events-content" id="eventsContent">
+            <div class="events-empty">
+              <div>
+                <i class="fas fa-inbox"></i>
+                <p>Seleccione una campaña para ver sus eventos</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-add-event" id="btnAddEvent" style="display: none;" onclick="abrirNuevoEvento()">
+            <i class="fas fa-calendar-plus"></i> Nuevo Evento
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal para Nuevo/Editar Evento -->
+  <div class="modal" id="eventModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="eventModalTitle">Nuevo Evento</h2>
+        <button class="modal-close" onclick="cerrarModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="eventForm">
+          <div class="form-group">
+            <label for="eventFrequency">Tipo de Ejecución:</label>
+            <select id="eventFrequency" onchange="cambiarFrecuencia()" required>
+              <option value="">-- Seleccione --</option>
+              <option value="mensual">Mensual</option>
+              <option value="diaria">Diaria</option>
+              <option value="semanal">Semanal</option>
+            </select>
+          </div>
+
+          <!-- Opciones Mensuales -->
+          <div id="monthlyOptions" style="display: none;">
+            <div class="form-group">
+              <label for="monthlyDay">Día del Mes:</label>
+              <input type="number" id="monthlyDay" min="1" max="31" placeholder="1-31">
+            </div>
+          </div>
+
+          <!-- Opciones Semanales -->
+          <div id="weeklyOptions" style="display: none;">
+            <div class="days-group">
+              <label>Seleccione los días de la semana:</label>
+              <div class="days-checkboxes">
+                <div class="checkbox-item">
+                  <input type="checkbox" id="day_lunes" value="lunes">
+                  <label for="day_lunes">Lunes</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="day_martes" value="martes">
+                  <label for="day_martes">Martes</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="day_miercoles" value="miercoles">
+                  <label for="day_miercoles">Miércoles</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="day_jueves" value="jueves">
+                  <label for="day_jueves">Jueves</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="day_viernes" value="viernes">
+                  <label for="day_viernes">Viernes</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="day_sabado" value="sabado">
+                  <label for="day_sabado">Sábado</label>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="day_domingo" value="domingo">
+                  <label for="day_domingo">Domingo</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eventStatus">Estado del Evento:</label>
+            <select id="eventStatus">
+              <option value="ALTA">Activo</option>
+              <option value="BAJA">Inactivo</option>
+              <option value="PAUSADO">Pausado</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save">
+              <i class="fas fa-save"></i> Guardar Evento
+            </button>
+            <button type="button" class="btn-cancel" onclick="cerrarModal()">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api-services.js"></script>
+  <script src="/js/campanas.js"></script>
+</body>
+</html>

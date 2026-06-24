@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Reportes - WhatsApp</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .reports-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      background-color: #e9ecef;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-button:hover {
+      background-color: #dee2e6;
+    }
+
+    .tab-button.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .dashboard-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-export {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.3s;
+    }
+
+    .btn-export:hover {
+      background-color: #218838;
+    }
+
+    .btn-export.pdf {
+      background-color: #dc3545;
+    }
+
+    .btn-export.pdf:hover {
+      background-color: #c82333;
+    }
+
+    .filters-section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .filter-group label {
+      font-weight: 500;
+      font-size: 13px;
+      color: #333;
+    }
+
+    .filter-group input,
+    .filter-group select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    .btn-filtrar {
+      background-color: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background-color 0.3s;
+    }
+
+    .btn-filtrar:hover {
+      background-color: #764ba2;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 8px;
+    }
+
+    .datos-table {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      max-height: 700px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table thead {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+
+    table th {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 2px solid #dee2e6;
+      color: #333;
+    }
+
+    table td {
+      padding: 12px;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .status-badge.activo {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.pendiente {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status-badge.cancelado {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-badge.entregado {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .btn-volver {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+
+    .btn-volver:hover {
+      background-color: #5a6268;
+    }
+
+    @media print {
+      .reports-tabs, .export-buttons, .btn-volver, .filters-section {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo-section">
+          <i class="fas fa-chart-bar"></i>
+          <h1>Dashboard de Reportes</h1>
+        </div>
+        <div class="user-section">
+          <button class="btn-volver" onclick="volverAlTablero()">
+            <i class="fas fa-arrow-left"></i> Volver
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="main-content" style="padding: 20px;">
+      
+      <!-- Pestañas de Dashboard -->
+      <div class="reports-tabs">
+        <button class="tab-button active" onclick="cambiarTab('tab-clientes')">
+          <i class="fas fa-users"></i>
+          Dashboard 1: Clientes Activos
+        </button>
+        <button class="tab-button" onclick="cambiarTab('tab-movimientos')">
+          <i class="fas fa-credit-card"></i>
+          Dashboard 2: Movimientos
+        </button>
+        <button class="tab-button" onclick="cambiarTab('tab-entrega')">
+          <i class="fas fa-box-open"></i>
+          Dashboard 3: Cliente vs Entrega
+        </button>
+      </div>
+
+      <!-- ================================== -->
+      <!-- DASHBOARD 1: CLIENTES ACTIVOS -->
+      <!-- ================================== -->
+      <div id="tab-clientes" class="tab-content active">
+        
+        <div class="dashboard-header">
+          <div class="dashboard-title">
+            <i class="fas fa-users" style="color: #667eea;"></i>
+            Clientes Activos por Tipo de Campaña
+          </div>
+          <div class="export-buttons">
+            <button class="btn-export" onclick="exportarClientesExcel()">
+              <i class="fas fa-file-excel"></i> Excel
+            </button>
+            <button class="btn-export pdf" onclick="exportarClientesPDF()">
+              <i class="fas fa-file-pdf"></i> PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+          <div class="filter-group">
+            <label for="filterEmpresa1">Empresa:</label>
+            <select id="filterEmpresa1" onchange="cargarClientesPorEmpresa()">
+              <option value="">Cargando empresas...</option>
+            </select>
+          </div>
+          <button class="btn-filtrar" onclick="refrescarClientes()">
+            <i class="fas fa-sync-alt"></i> Refrescar
+          </button>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid" id="statsClientesContainer">
+          <div class="stat-card">
+            <div class="stat-value" id="totalClientesStats">0</div>
+            <div class="stat-label">Clientes Totales</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statsDiario">0</div>
+            <div class="stat-label">Campaña Diaria</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statsSemanal">0</div>
+            <div class="stat-label">Campaña Semanal</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statsMensual">0</div>
+            <div class="stat-label">Campaña Mensual</div>
+          </div>
+        </div>
+
+        <!-- Tabla de Clientes -->
+        <div class="datos-table">
+          <div class="table-container" id="tablaClientesContainer">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>Cargando datos...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================== -->
+      <!-- DASHBOARD 2: MOVIMIENTOS DE TARJETAS -->
+      <!-- ================================== -->
+      <div id="tab-movimientos" class="tab-content">
+        
+        <div class="dashboard-header">
+          <div class="dashboard-title">
+            <i class="fas fa-credit-card" style="color: #f5576c;"></i>
+            Movimientos de Tarjetas / Órdenes
+          </div>
+          <div class="export-buttons">
+            <button class="btn-export" onclick="exportarMovimientosExcel()">
+              <i class="fas fa-file-excel"></i> Excel
+            </button>
+            <button class="btn-export pdf" onclick="exportarMovimientosPDF()">
+              <i class="fas fa-file-pdf"></i> PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+          <div class="filter-group">
+            <label for="filterEmpresa2">Empresa:</label>
+            <select id="filterEmpresa2" onchange="cargarMovimientos()">
+              <option value="">Cargando empresas...</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterRango">Rango:</label>
+            <select id="filterRango" onchange="cargarMovimientos()">
+              <option value="diario">Diario</option>
+              <option value="semanal">Semanal</option>
+              <option value="mensual" selected>Mensual</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterFecha">Fecha:</label>
+            <input type="date" id="filterFecha" onchange="cargarMovimientos()">
+          </div>
+          <button class="btn-filtrar" onclick="refrescarMovimientos()">
+            <i class="fas fa-sync-alt"></i> Refrescar
+          </button>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid" id="statsMovimientosContainer">
+          <div class="stat-card">
+            <div class="stat-value" id="totalOrdenes">0</div>
+            <div class="stat-label">Total Órdenes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="ordenesEntregadas">0</div>
+            <div class="stat-label">Entregadas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="ordenesPendientes">0</div>
+            <div class="stat-label">Pendientes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="ordenesCanceladas">0</div>
+            <div class="stat-label">Canceladas</div>
+          </div>
+        </div>
+
+        <!-- Tabla de Movimientos -->
+        <div class="datos-table">
+          <div class="table-container" id="tablaMovimientosContainer">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>Cargando datos...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================================== -->
+      <!-- DASHBOARD 3: CLIENTE VS ENTREGA -->
+      <!-- ================================== -->
+      <div id="tab-entrega" class="tab-content">
+        
+        <div class="dashboard-header">
+          <div class="dashboard-title">
+            <i class="fas fa-box-open" style="color: #4facfe;"></i>
+            Clientes vs Entregas
+          </div>
+          <div class="export-buttons">
+            <button class="btn-export" onclick="exportarEntregasExcel()">
+              <i class="fas fa-file-excel"></i> Excel
+            </button>
+            <button class="btn-export pdf" onclick="exportarEntregasPDF()">
+              <i class="fas fa-file-pdf"></i> PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+          <div class="filter-group">
+            <label for="filterEmpresa3">Empresa:</label>
+            <select id="filterEmpresa3" onchange="cargarEntregas()">
+              <option value="">Cargando empresas...</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterRango2">Rango:</label>
+            <select id="filterRango2" onchange="cargarEntregas()">
+              <option value="diario">Diario</option>
+              <option value="semanal">Semanal</option>
+              <option value="mensual" selected>Mensual</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterFecha2">Fecha:</label>
+            <input type="date" id="filterFecha2" onchange="cargarEntregas()">
+          </div>
+          <button class="btn-filtrar" onclick="refrescarEntregas()">
+            <i class="fas fa-sync-alt"></i> Refrescar
+          </button>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats-grid" id="statsEntregasContainer">
+          <div class="stat-card">
+            <div class="stat-value" id="totalClientes3">0</div>
+            <div class="stat-label">Clientes Totales</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalOrdenes3">0</div>
+            <div class="stat-label">Órdenes Totales</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="tasaEntrega">0%</div>
+            <div class="stat-label">Tasa de Entrega</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="promedioOrdenesPorCliente">0</div>
+            <div class="stat-label">Promedio Órdenes/Cliente</div>
+          </div>
+        </div>
+
+        <!-- Tabla de Entregas -->
+        <div class="datos-table">
+          <div class="table-container" id="tablaEntregasContainer">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>Cargando datos...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Scripts de librerías externas - usando CDN alternativo -->
+  <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  
+  <!-- Scripts de la aplicación -->
+  <script src="/js/api-services.js"></script>
+  <script src="/js/reportes.js"></script>
+</body>
+</html>

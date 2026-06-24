@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tablero Kanban - WhatsApp Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo-section">
+          <i class="fas fa-comments"></i>
+          <h1>Gestor de Mensajes WhatsApp</h1>
+        </div>
+        <div class="user-section">
+          <div class="user-info">
+            <span class="user-name" id="userName">Cargando...</span>
+            <span class="user-role" id="userRole">-</span>
+          </div>
+          <button class="btn-logout" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Salir
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Barra de herramientas -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <!--
+          <div class="filter-group">
+            <label for="filterDate">Filtrar por fecha:</label>
+            <input type="date" id="filterDate" onchange="filtrarPorFecha()">
+          </div>  
+        -->  
+
+        <div class="filter-group">
+          <label for="filterCliente">Cliente:</label>
+          <select id="filterCliente" onchange="filtrarPorcliente()"> 
+            <option value="">Cargando clientes...</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filterStatus">Estado:</label>
+          <select id="filterStatus" onchange="filtrarPorEstado()"> 
+            <option value="">Todos los estados</option>
+            <option value="Recepción">Recepción</option>
+            <option value="Orden">Orden</option>
+            <option value="En empaquetado">En empaquetado</option>
+            <option value="Lista para Entrega">Lista para Entrega</option>
+            <option value="En ruta">En ruta</option>
+            <option value="Entregado">Entregado</option>
+            <option value="Cancelado">Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <label class="checkbox-filter" title="Vista simplificada de tarjetas">
+          <input type="checkbox" id="viewMode" onchange="alternarVistaSimplificada()" />
+          <span><i class="fas fa-list"></i> Vista Simplificada</span>
+        </label>
+        <button class="btn-refresh" onclick="refrescarTablero()">
+          <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
+        <button class="btn-reports" onclick="window.location.href='/campanas.html'">
+          <i class="fas fa-bullhorn"></i> Campañas 
+        </button>
+        <button class="btn-reports" onclick="abrirReportes()">
+          <i class="fas fa-chart-bar"></i> Reportes
+        </button>
+        <button class="btn-reports" onclick="abrirAdministracion()">
+          <i class="fas fa-cog"></i> Administración
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <main class="main-content">
+      <!-- Tablero Kanban -->
+      <div class="kanban-board">
+        <div class="kanban-column" data-status="Recepción">
+          <div class="column-header reception">
+            <div class="column-title" onclick="abrirVistaGrilla('Recepción')" style="cursor: pointer;">
+              <i class="fas fa-inbox"></i>
+              <h2>Recepción</h2>
+            </div>
+            <span class="column-count" id="count-recepcion">0</span>
+          </div>
+          <div class="cards-container" id="column-recepcion">
+            <!-- Las tarjetas se cargarán aquí -->
+          </div>
+        </div>
+
+        <div class="kanban-column" data-status="Orden">
+          <div class="column-header order">
+            <div class="column-title" onclick="abrirVistaGrilla('Orden')" style="cursor: pointer;">
+              <i class="fas fa-clipboard-list"></i>
+              <h2>Orden</h2>
+            </div>
+            <span class="column-count" id="count-orden">0</span>
+          </div>
+          <div class="cards-container" id="column-orden">
+            <!-- Las tarjetas se cargarán aquí -->
+          </div>
+        </div>
+
+        <div class="kanban-column" data-status="En empaquetado">
+          <div class="column-header packing">
+            <div class="column-title" onclick="abrirVistaGrilla('En empaquetado')" style="cursor: pointer;">
+              <i class="fas fa-box"></i>
+              <h2>En empaquetado</h2>
+            </div>
+            <span class="column-count" id="count-empaquetado">0</span>
+          </div>
+          <div class="cards-container" id="column-empaquetado">
+            <!-- Las tarjetas se cargarán aquí -->
+          </div>
+        </div>
+
+        <div class="kanban-column" data-status="Lista para Entrega">
+          <div class="column-header ready">
+            <div class="column-title" onclick="abrirVistaGrilla('Lista para Entrega')" style="cursor: pointer;">
+              <i class="fas fa-check-circle"></i>
+              <h2>Lista para Entrega</h2>
+            </div>
+            <span class="column-count" id="count-lista-entrega">0</span>
+          </div>
+          <div class="cards-container" id="column-lista-entrega">
+            <!-- Las tarjetas se cargarán aquí -->
+          </div>
+        </div>
+
+        <div class="kanban-column" data-status="En ruta">
+          <div class="column-header shipping">
+            <div class="column-title" onclick="abrirVistaGrilla('En ruta')" style="cursor: pointer;">
+              <i class="fas fa-truck"></i>
+              <h2>En ruta</h2>
+            </div>
+            <span class="column-count" id="count-en-ruta">0</span>
+          </div>
+          <div class="cards-container" id="column-en-ruta">
+            <!-- Las tarjetas se cargarán aquí -->
+          </div>
+        </div>
+
+        <div class="kanban-column" data-status="Entregado">
+          <div class="column-header delivered">
+            <div class="column-title" onclick="abrirVistaGrilla('Entregado')" style="cursor: pointer;">
+              <i class="fas fa-thumbs-up"></i>
+              <h2>Entregado</h2>
+            </div>
+            <span class="column-count" id="count-entregado">0</span>
+          </div>
+          <div class="cards-container" id="column-entregado">
+            <!-- Las tarjetas se cargarán aquí -->
+          </div>
+        </div>
+
+        <div class="kanban-column" data-status="Cancelado">
+          <div class="column-header cancelled">
+            <div class="column-title" onclick="abrirVistaGrilla('Cancelado')" style="cursor: pointer;">
+              <i class="fas fa-ban"></i>
+              <h2>Cancelado</h2>
+            </div>
+            <span class="column-count" id="count-cancelado">0</span>
+          </div>
+          <div class="cards-container" id="column-cancelado">
+            <!-- Las tarjetas se cargarán aquí -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal para detalles de tarjeta -->
+  <div id="cardModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Detalles del Mensaje</h2>
+        <span class="close" onclick="cerrarModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row">
+          <label>De:</label>
+          <span id="modalFrom"></span>
+        </div>
+        <div class="detail-row">
+          <label>Teléfono:</label>
+          <span id="modalPhone"></span>
+        </div>
+        <div class="detail-row">
+          <label>Mensaje:</label>
+          <p id="modalMessage"></p>
+        </div>
+        <div class="detail-row">
+          <label>Fecha de recepción:</label>
+          <span id="modalDate"></span>
+        </div>
+        <div class="detail-row">
+          <label>Estado actual:</label>
+          <span id="modalStatus"></span>
+        </div>
+  
+        <div class="detail-row"> 
+          <label>Asignado a:</label>   
+          <select id="modalAssigned">
+            <option value="">Seleccionar usuario...</option>
+            <option value="1">Juan Pérez</option>
+            <option value="2">María García</option>
+            <option value="3">Carlos López</option>
+          </select>   
+        </div>
+
+     <!-- Radio boton para cargar un tipo de mensaje ya guardado  -->    
+      <div class="detail-row"> 
+        <div class="radio-group">
+          <label><input type="radio" name="usuario" value="1"> Confirma orden </label>
+          <label><input type="radio" name="usuario" value="2"> Aclaración </label>
+          <label><input type="radio" name="usuario" value="3"> Negación Pedido </label>
+        </div>
+      </div> 
+
+
+      </div>
+      <div class="modal-footer">
+        <textarea id="commentBox" placeholder="Agregar comentario..."></textarea>  
+        <label class="btn-optional btn-checkbox">
+          <input type="checkbox" id="notifyCheckbox" >
+          <span>Notificar al cliente</span>
+        </label> 
+        <button class="btn-primary" onclick="agregarComentario()"> Guardar </button>
+        <button class="btn-secondary" onclick="cerrarModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para historial de eventos -->
+  <div id="historyModal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>Historial de Cambios</h2>
+        <span class="close" onclick="cerrarHistorial()">&times;</span>
+      </div>
+      <div class="modal-body" id="historyList">
+        <!-- El historial se cargará aquí -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="cerrarHistorial()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para vista de grilla de sección -->
+  <div id="grillaSectionModal" class="modal">
+    <div class="modal-content modal-grilla">
+      <div class="modal-header">
+        <h2 id="grillaTitle">Sección</h2>
+        <span class="close" onclick="cerrarGrilla()">&times;</span>
+      </div>
+      <div class="modal-body modal-grilla-body">
+        <table class="grilla-table" id="grillaTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Folio</th>
+              <th>Nombre</th>
+              <th>Teléfono</th>
+              <th>Mensaje</th>
+              <th>Fecha de Recepción</th>
+              <th>Estado</th>
+              <th>Asignado a</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="grillaTableBody">
+            <!-- Se cargará dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="cerrarGrilla()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Administración de Notificaciones -->
+  <div id="administracionModal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2><i class="fas fa-cog"></i> Administración de Notificaciones</h2>
+        <span class="close" onclick="cerrarAdministracion()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <!-- Formulario para crear/editar notificación -->
+        <div class="admin-form-section">
+          <h3>Crear/Editar Notificación</h3>
+          <div class="form-group">
+            <label for="adminEmpresa">Empresa:</label>
+            <select id="adminEmpresa">
+              <option value="">Seleccionar empresa...</option> 
+              <option value="1"> Empresa dummy... </option> 
+            </select>
+          </div>
+
+        <div class="detail-row"> 
+          <div class="radio-group">
+            <label><input type="radio" name="radio_msg" id="radio_msg1" value="1"> Confirma orden </label>
+            <label><input type="radio" name="radio_msg" id="radio_msg2" value="2"> Aclaración </label>
+            <label><input type="radio" name="radio_msg" id="radio_msg3" value="3"> Negación Pedido </label>
+          </div>
+        </div> 
+
+          <div class="form-group">
+            <label for="adminMensaje">Mensaje:</label>
+            <textarea id="adminMensaje" placeholder="Ingresa el mensaje (máx. 255 caracteres)" maxlength="255" rows="4"></textarea>
+            <small id="charCount">0/255 caracteres</small>
+          </div>
+          <div class="form-group" id="editIdGroup" style="display: none;">
+            <input type="hidden" id="adminId">
+            <button class="btn-primary" onclick="actualizarNotificacion()">
+              <i class="fas fa-save"></i> Actualizar
+            </button>
+            <button class="btn-secondary" onclick="limpiarFormAdmin()">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+          <div class="form-group" id="createGroup">
+            <button class="btn-primary" onclick="crearNotificacion()">
+              <i class="fas fa-plus"></i> Crear Notificación
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de notificaciones -->
+        <div class="admin-list-section">
+          <h3>Notificaciones por Empresa (máximo 3 por empresa)</h3>
+          <div class="notifications-container" id="notificacionesContainer">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>Cargando notificaciones...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="cerrarAdministracion()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api-services.js"></script>
+  <script src="/js/administracion.js"></script>
+  <script src="/js/kanban.js"></script> 
+  <script>
+    // Cargar datos del usuario al iniciar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      // cargarDatosUsuario();   
+
+      //  Este dato debera tomarse del login que asigne la los datos de quien se loging 
+      const sesionUser = { 
+          id_empresa :  1 
+      }
+
+      sessionStorage.setItem('userSesion', JSON.stringify(sesionUser)); 
+      // sessionStorage.setItem('token', JSON.stringify(data.body));
+
+      const userSesionString = sessionStorage.getItem('userSesion');
+      const userSesion = JSON.parse(userSesionString);   // ← convertir a objeto
+
+      console.log("Valor obtenido:", userSesion.id_empresa); // 1
+
+      inicializarApp();    
+      
+      // cargarClientes(); // Cargar clientes dinámicamente 
+
+      cargarTarjetas();
+    });    
+
+  // Función que llena el componente de mensaje según la opción elegida
+  function llenarMensaje(valor) {
+    if (!selectedCard) {
+      alert('Error: No hay tarjeta seleccionada');
+      return;
+    }
+    
+    // Obtener el folio de la tarjeta actual
+    const folio = selectedCard.folio_orden || selectedCard.id_mensaje || selectedCard.id || 'N/A';
+    const nombre = selectedCard.pushName || selectedCard.nombre || 'cliente';
+    
+    // Definir el contenido del mensaje según el valor
+    let mensaje = '';
+    switch (valor) {
+      case '1':
+        mensaje = `📋 Hola *${nombre}*, por parte de Rubai te confirmamos que hemos recibido tu pedido. Al cual le hemos asignado el folio; *${folio.substring(7)}*. Seguimos trabajando en el, cualquier avance con gusto te informaremos. Gracias por elegirnos, ¡que tengas un excelente día! 😀`; 
+        break;
+      case '2':
+        mensaje = `📋 Hola *${nombre}*, tenemos una aclaración respecto a tu pedido con folio *${folio.substring(7)}*. Por favor, contacta con nuestro equipo para más detalles. Gracias.`;
+        break;
+      case '3':
+        mensaje = `📋 Hola *${nombre}*, lamentamos informarte que no hemos podido procesar tu pedido con folio *${folio.substring(7)}*. Por favor, contacta con nuestro equipo para más información. Disculpa las molestias.`;
+        break;
+      default:
+        mensaje = '🔘 Selecciona una opción para ver su mensaje.';
+    }
+    
+    document.getElementById('commentBox').value = mensaje; // Llenar el textarea con el mensaje seleccionado 
+  }
+
+
+      // Escuchar cambios en los radio buttons
+        const radios = document.querySelectorAll('input[name="usuario"]');
+        radios.forEach(radio => {
+          radio.addEventListener('change', function() {
+            if (this.checked) {
+              llenarMensaje(this.value);
+            }
+          });
+        }); 
+  
+  </script> 
+
+</body>
+</html>
