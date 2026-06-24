@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const fsotro = require('fs');
 require('dotenv').config();
 
 const app = express();
@@ -55,8 +56,8 @@ app.use((err, req, res, next) => {
 
 
 const options = {
-    key: fs.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/privkey.pem')),
-    cert: fs.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/fullchain.pem')),
+    key: fsotro.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/privkey.pem')),
+    cert: fsotro.readFileSync(path.join('/etc/letsencrypt/live/srv743626.hstgr.cloud/fullchain.pem')),
   };
   
 
