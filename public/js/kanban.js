@@ -6,8 +6,8 @@ let selectedCard = null;
 let modalZIndex = 1000; // Para controlar el orden de modales superpuestos
 let vistaSimplificada = false; // Control de vista simplificada
 
- const urlbase = 'http://localhost:4004'; // desarrollo    
- //const urlbase = 'https://srv743626.hstgr.cloud:443';  //  produccion  
+ // const urlbase = 'http://localhost:4005'; // desarrollo    
+ const urlbase = 'https://srv743626.hstgr.cloud:4005';  //  produccion  
  
   const storedUser = localStorage.getItem('currentUser');
   const usuariosArray = JSON.parse(storedUser);

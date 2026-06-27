@@ -1,5 +1,5 @@
 {
-  "name": "dashboard-whatsapp",
+  "name": "kanban-whatsapp",
   "version": "1.0.0",
   "description": "Tablero Kanban para gestión de mensajes WhatsApp",
   "main": "app.js",

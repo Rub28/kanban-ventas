@@ -3,8 +3,8 @@
  * Organiza todas las llamadas fetch por módulo/servicio
  */
 
-const API_BASE_URL = 'http://localhost:4004'; // desarrollo
-// const API_BASE_URL = 'https://srv743626.hstgr.cloud:443'; // producción
+// const API_BASE_URL = 'http://localhost:4004'; // desarrollo
+ const API_BASE_URL = 'https://srv743626.hstgr.cloud:4005'; // producción
 
 // ============================
 // SERVICIO DE ÓRDENES
