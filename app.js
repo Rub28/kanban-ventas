@@ -70,7 +70,9 @@ const options = {
 
 const PORT = process.env.SERVER_PORT || 3301;
 app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en puerto ${PORT}`);
+  console.log(`Servidor ejecutándose en puerto ${PORT}`);  
+  console.log (`Kanban-ventas servidor web `);   
+  console.log (` busca el Backend en; https://srv743626.hstgr.cloud:4005` );  //  produccion  
   console.log(`Abre http://localhost:${PORT} en tu navegador`);
 });
 
