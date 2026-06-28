@@ -1,9 +1,9 @@
 {
-  "name": "kanban-whatsapp",
+  "name": "kanban-ventas",
   "version": "1.0.0",
   "description": "Tablero Kanban para gestión de mensajes WhatsApp",
   "main": "app.js", 
-  "scripts": {
+   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
